@@ -25,12 +25,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          # cache убран намеренно, чтобы не требовался lock-файл
 
       - name: Install dependencies
         run: npm install
 
       - name: Build
         run: npm run build
+        env:
+          # base уже зашит в vite.config.ts, тут ничего не подставляем
+          CI: true
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
