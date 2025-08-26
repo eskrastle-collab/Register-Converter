@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'   # без lock-файла просто не будет кеша — это ок
+          cache: 'npm'   # Р±РµР· lock-С„Р°Р№Р»Р° РїСЂРѕСЃС‚Рѕ РЅРµ Р±СѓРґРµС‚ РєРµС€Р° вЂ” СЌС‚Рѕ РѕРє
       - run: npm install
       - run: npm run build -- --base=/${{ github.event.repository.name }}/
       - uses: actions/upload-pages-artifact@v3
