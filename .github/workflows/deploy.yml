@@ -32,8 +32,13 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build
+      - name: Build (base=/)
         run: npm run build
+        env:
+          VITE_BASE: /
+
+      - name: Add CNAME for custom domain
+        run: echo "converter.stocksi.ru" > dist/CNAME
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
