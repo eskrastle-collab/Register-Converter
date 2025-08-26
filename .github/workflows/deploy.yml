@@ -25,15 +25,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          # cache убран намеренно, чтобы не требовался lock-файл
+
+      - name: Sanitize npm config (public registry, no auth)
+        run: |
+          npm config set registry https://registry.npmjs.org/
+          npm config delete //registry.npmjs.org/:_authToken || true
+          npm config set audit false
+          npm config set fund false
+          echo "Using npm registry: $(npm config get registry)"
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --no-audit --no-fund
 
       - name: Build
         run: npm run build
         env:
-          # base уже зашит в vite.config.ts, тут ничего не подставляем
           CI: true
 
       - name: Configure Pages
