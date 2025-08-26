@@ -26,16 +26,40 @@ jobs:
         with:
           node-version: 20
 
-      - name: Sanitize npm config (public registry, no auth)
+      # --- ключевой шаг: почистить npm, убрать auth и зафиксировать публичный реестр
+      - name: Sanitize npm (force public registry, no auth)
+        shell: bash
         run: |
-          npm config set registry https://registry.npmjs.org/
+          set -euxo pipefail
+          # Удаляем любые пользовательские конфиги
+          rm -f ~/.npmrc .npmrc || true
+          # Создаём локальный .npmrc только с публичным реестром
+          cat > .npmrc <<'RC'
+registry=https://registry.npmjs.org/
+always-auth=false
+audit=false
+fund=false
+RC
+          # На всякий случай чистим все возможные ключи авторизации и скоповые реестры
           npm config delete //registry.npmjs.org/:_authToken || true
-          npm config set audit false
-          npm config set fund false
-          echo "Using npm registry: $(npm config get registry)"
+          npm config delete @types:registry || true
+          npm config delete @*:registry || true
+          npm config set registry https://registry.npmjs.org/
+          npm config set always-auth false
+          echo "Effective npm registry: $(npm config get registry)"
+          echo "npmrc:"
+          cat .npmrc
+        env:
+          NODE_AUTH_TOKEN: ""
+          NPM_TOKEN: ""
+          NPM_CONFIG_USERCONFIG: ""
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+        env:
+          NODE_AUTH_TOKEN: ""
+          NPM_TOKEN: ""
+          NPM_CONFIG_USERCONFIG: ""
 
       - name: Build
         run: npm run build
